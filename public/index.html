@@ -259,13 +259,12 @@
     const $ = (selector) => document.querySelector(selector)
 
     const form = $('form')
-    const input = $('input')
+    const input = $('#sendMessage')
     const messages = $('#messages')
    
     form.addEventListener('submit', (e) => {
         e.preventDefault()
         if(input.value){
-
             const clientOffset = `${socket.id}-${counter++}`
             socket.emit('chat message', input.value, clientOffset)
             input.value = ''
@@ -378,7 +377,7 @@
             </ul>
 
             <form action="">
-                <input type="text" name="message" placeholder="Escribe tu mensaje">
+                <input type="text" id="sendMessage" name="message" placeholder="Escribe tu mensaje">
                 <button type="submit">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-send"><path d="M0 0h24v24H0z" stroke="none"/><path d="M10 14 21 3M21 3l-6.5 18a.55.55 0 0 1-1 0L10 14l-7-3.5a.55.55 0 0 1 0-1L21 3"/></svg>
                 </button>
