@@ -29,6 +29,9 @@ if (cluster.isPrimary) {
     adapter: createAdapter()
   })
 
+  const ACCESS_TOKEN = process.env.ACCESS_TOKEN
+
+
 
   function sendMessageToWhatsApp() {
 
@@ -63,7 +66,7 @@ if (cluster.isPrimary) {
       path: "/v21.0/444271245440118/messages",
       method: "POST",
       headers: {
-        "Authorization": "Bearer EAAqKwdkjpU8BO23tQ4KVifQoVLZBnkDZB5jhSwFlfi3tfrlAtQYwkIf0tbAOmYA3TVkXJAKWe6GOQRA82rTuuyRQ2ZCh04sdQ8WnT3e1oO3L6AA4p8yLJJwnrCnMAJcP9IhvlQYpQuDkd1ZBfCNh28GVH83krNS6tGVZAXlZA4cGmYhXJPLlZCONZCcWEfdNGNHWEwHCVopZABRef04xI5H4DiIdZCnXfYMmkovYQwZCERCy2PxqPOSa8fY",
+        "Authorization": `Bearer ${ACCESS_TOKEN}`,
         "Content-Type": "application/json",
       },
     };
