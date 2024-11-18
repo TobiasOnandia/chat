@@ -11,16 +11,21 @@
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 
     :root{
-        --primary-color: #1b1b1b;
-        --secondary-color: #f1f1f1;
-        --foreground: #ccc ;
-        --tertiary-color: #000000;
-        --border-color: #333333;
+        --background: #131313;
+        --foreground: #2e333d;
+        --muted: #474c55;
+        --accent: #6b8afd ;
+        --accent-foreground: #ffffff;
+    }
+    #root, #__next {
+        isolation: isolate;
     }
     *, *::before, *::after {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
+        color: var(--accent-foreground);
+
     }
     body {
         line-height: 1.5;
@@ -50,10 +55,14 @@
     h1, h2, h3, h4, h5, h6 {
         text-wrap: balance;
     }
-
+    ul{
+        list-style: none;
+    }
 
     main{
         flex: 1;
+        background-color: var(--foreground);        
+
     }
 
     #messages{
@@ -62,32 +71,89 @@
         height: 85%;
         & > li {
             padding: 0.5rem 1rem;
-            background-color: var(--foreground);
+            background-color: var(--accent);
             border-radius: 5px;
             width: max-content;
             margin: 0.5rem;
-            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;    
+            justify-content: center;
+        
         }
-
-        & > li:nth-child(even){
-            background-color: var(--tertiary-color);
-
-        }
-
     }
 
-    section{
+    .content-users{
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        padding: 1rem;
+        border-radius: 10px;
+    }
+
+    .content-navigation{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem 3rem;
+        width: max-content;
+        background-color: var(--background);
+        position: relative;
+
+        &>h1{
+            font-size: 1.5rem;
+            flex: 0.5;
+        }
+
+
+        & > nav{
+            display: flex;
+            flex:1;
+        }
+    }
+
+    .nav-actions{
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+
+        & > li:hover {
+            background-color: var(--muted);
+            border-radius: 5px;
+            cursor: pointer;
+            
+            & > button {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    }
+
+    .content-header, .chat-actions{
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 1rem;
     }
 
+    .content-messages{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        height: 88%;
+    }
+
     form{
         display: flex;
-        align-items: end;
         gap: 0.2rem;
         padding: 0.5rem;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
     }
 
     input{
@@ -95,8 +161,29 @@
         border-radius: 5px;
         height: 2rem;
         padding: 0.5rem;
-        border: 1px solid var(--border-color);
-        background-color: transparent;
+        background-color: var(--muted);
+        border: none;
+        outline: none;
+        &:is(:focus, :active){
+            outline: 1px solid var(--accent);
+        }
+    }
+
+    label{
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: relative;
+
+        & > svg{
+            position: absolute;
+            right: 0.5rem;
+        }
+    }
+
+    input[type="search"]{
+        padding: 1rem;
+        height: 2rem;
     }
 
     button{
@@ -114,29 +201,31 @@
     }
 
     aside{
+        display: flex;
         flex: 0.2;
         border-right: 1px solid var(--border-color);
         height: 100vh;
+        background-color: var(--foreground);        
 
     }
 
     #users{
-        border-right: 1px solid var(--secondary-color);
-
+        padding: 0.5rem;
+        width: 100%;
 
         & > li {
             padding: 1rem;
             cursor: pointer;
+            border-radius: 5px;
+        width: 100%;
+
             &:hover{
-                background-color: var(--tertiary-color);
-                color: var(--secondary-color);
+                background-color: var(--background);
             }
         }
     }
 
-    #root, #__next {
-        isolation: isolate;
-    }
+
 </style>
 
 <script type="module">
@@ -167,7 +256,10 @@
     socket.on('chat message', (message, serverOffset) => {
         console.log("Mensaje recibido desde whatsapp",message)
         const messageElement = document.createElement('li')
-        messageElement.textContent = message
+        messageElement.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-user"><path d="M0 0h24v24H0z" stroke="none"/><path d="M8 7a4 4 0 1 0 8 0 4 4 0 0 0-8 0M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+        <span>${message}</span>
+        `
         messages.appendChild(messageElement)
         window.scrollTo(0, document.body.scrollHeight)
         socket.auth.serverOffset = serverOffset
@@ -176,31 +268,85 @@
 </script>
 <body>
     <aside>
-        <section>
-            <h3>
-                Chats
-            </h3>
-            <button>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path d="M0 0h24v24H0z" stroke="none"/><path d="M12 5V19M5 12H19"/></svg>
-            </button>
-        </section>        
-        <ul id="users">
-            <li>Usuario 1</li>
-            <li>Usuario 2</li>
-            <li>Usuario 3</li>
-        </ul>
+
+        <section class="content-navigation">
+            <h1>CH</h1>
+
+            <nav>
+                <ul class="nav-actions">
+                    <li>
+                        <button>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-hipchat"><path d="M0 0h24v24H0z" stroke="none"/><path d="M17.802 17.292s.077-.055.2-.149c1.843-1.425 3-3.49 3-5.789 0-4.286-4.03-7.764-9-7.764s-9 3.478-9 7.764c0 4.288 4.03 7.646 9 7.646.424 0 1.12-.028 2.088-.084 1.262.82 3.104 1.493 4.716 1.493.499 0 .734-.41.414-.828-.486-.596-1.156-1.551-1.416-2.29z"/><path d="M7.5 13.5c2.5 2.5 6.5 2.5 9 0"/></svg>
+                        </button>
+                    </li>
+                    <li>
+                        <button>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-folder"><path d="M0 0h24v24H0z" stroke="none"/><path d="M5 4h4l3 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2"/></svg>
+                        </button>
+                    </li>
+                    <li>
+                        <button>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-calendar"><path d="M0 0h24v24H0z" stroke="none"/><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7zM16 3v4M8 3v4M4 11h16M11 15h1M12 15v3"/></svg>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </section>
+
+        <section class="content-users">
+            <label for="search">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path d="M0 0h24v24H0z" stroke="none"/><path d="M3 10a7 7 0 1 0 14 0 7 7 0 1 0-14 0M21 21l-6-6"/></svg>
+                <input type="search" id="search" name="search" placeholder="Buscar...">
+            </label>
+            <ul id="users">
+                <li>Usuario 1</li>
+                <li>Usuario 2</li>
+                <li>Usuario 3</li>
+                <li>Usuario 3</li>
+                <li>Usuario 3</li>
+                <li>Usuario 3</li>
+                <li>Usuario 3</li>
+                <li>Usuario 3</li>
+                <li>Usuario 3</li>
+                <li>Usuario 3</li>
+                <li>Usuario 3</li>
+            </ul>
+        </section>
     </aside>
     <main>
-        <section>
+        <section class="content-header">
             <h2>+542954270707</h2>
+            <ul class="chat-actions">
+                <li>
+                    <button>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path d="M0 0h24v24H0z" stroke="none"/><path d="M3 10a7 7 0 1 0 14 0 7 7 0 1 0-14 0M21 21l-6-6"/></svg>
+                    </button>
+                
+                </li>
+                <li>
+                    <button>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-phone"><path d="M0 0h24v24H0z" stroke="none"/><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
+                    </button>
+                </li>
+            </ul>
         </section>
-        <ul id="messages"></ul>
+        <section class="content-messages">
+            <ul id="messages">
+                <li>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-user"><path d="M0 0h24v24H0z" stroke="none"/><path d="M8 7a4 4 0 1 0 8 0 4 4 0 0 0-8 0M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+
+                    <span>ESTO ES UN MENSAJE</span>
+                </li>
+            </ul>
+
         <form action="">
             <input type="text" name="message" placeholder="Escribe tu mensaje">
             <button type="submit">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-send"><path d="M0 0h24v24H0z" stroke="none"/><path d="M10 14 21 3M21 3l-6.5 18a.55.55 0 0 1-1 0L10 14l-7-3.5a.55.55 0 0 1 0-1L21 3"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-send"><path d="M0 0h24v24H0z" stroke="none"/><path d="M10 14 21 3M21 3l-6.5 18a.55.55 0 0 1-1 0L10 14l-7-3.5a.55.55 0 0 1 0-1L21 3"/></svg>
             </button>
         </form>
+        </section>
+
     </main>
 </body>
 </html>
