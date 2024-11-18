@@ -73,7 +73,7 @@ if (cluster.isPrimary) {
   // Ruta para manejar eventos del webhook
   app.post('/webhook', async (req, res) => {
     const body = req.body
-
+    console.log(body)
     if (body.object === 'whatsapp_business_account') {
       const entry = body.entry[0]
       const changes = entry.changes[0]
