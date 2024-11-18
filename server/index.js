@@ -29,6 +29,7 @@ if (cluster.isPrimary) {
     adapter: createAdapter()
   })
 
+  // eslint-disable-next-line no-undef
   const ACCESS_TOKEN = process.env.ACCESS_TOKEN
   const VERIFY_TOKEN = 'myTokenAccess'
   const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID
@@ -105,6 +106,7 @@ if (cluster.isPrimary) {
 
   // Función para enviar mensajes a través de WhatsApp
   function sendMessageToWhatsApp(messageText, phoneNumber) {
+    console.log("Enviando mensaje a whatsapp", messageText, phoneNumber)
     const data = JSON.stringify({
       messaging_product: "whatsapp",
       to: phoneNumber,
@@ -146,9 +148,9 @@ if (cluster.isPrimary) {
 
   // Manejo de conexión de Socket.io
   io.on('connection', async (socket) => {
-    console.log('Un usuario se ha conectado')
-
+    console.log("Un usuario se ha conectado")
     socket.on('chat message', async (message, clientOffset, callback) => {
+      console.log("Mensaje recibido desde el chat web", message, clientOffset)
       let result
       const phoneNumber = '542954526316' // Número de teléfono del cliente
 

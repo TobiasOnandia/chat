@@ -165,6 +165,7 @@
     })
 
     socket.on('chat message', (message, serverOffset) => {
+        console.log("Mensaje recibido desde whatsapp",message)
         const messageElement = document.createElement('li')
         messageElement.textContent = message
         messages.appendChild(messageElement)
