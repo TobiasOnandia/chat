@@ -1,5 +1,4 @@
 'use strict'
-
 import express from 'express'
 import { createServer } from 'node:http'
 import { Server } from 'socket.io'
@@ -9,6 +8,8 @@ import { availableParallelism } from 'node:os'
 import cluster from 'node:cluster'
 import { createAdapter, setupPrimary } from '@socket.io/cluster-adapter'
 import https from 'https'
+import dotenv from 'dotenv'
+dotenv.config()
 
 if (cluster.isPrimary) {
   const numCpus = availableParallelism()
