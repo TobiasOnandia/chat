@@ -163,6 +163,32 @@ if (cluster.isPrimary) {
     })
   })
 
+  app.get('/webhook', (req, res) => {
+    const mode = req.query['hub.mode'];
+    const token = req.query['hub.verify_token'];
+    const challenge = req.query['hub.challenge'];
+
+    // Tu token de verificación, debe coincidir con el configurado en Meta
+    const VERIFY_TOKEN = 'myTokenAccess';
+
+    // Comprueba que el token coincida
+    if (mode && token === VERIFY_TOKEN) {
+      console.log('Webhook validado correctamente.');
+      res.status(200).send(challenge); // Responde con el valor del challenge
+    } else {
+      console.log('Error de validación del webhook.');
+      res.sendStatus(403); // No autorizado
+    }
+  });
+
+  app.post('/webhook', (req, res) => {
+    const body = req.body;
+    console.log('Evento recibido:', body);
+
+    // Envía una respuesta de éxito
+    res.status(200).send('EVENT_RECEIVED');
+  });
+
 
 
   server.listen(port, () => {
