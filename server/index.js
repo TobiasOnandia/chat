@@ -72,36 +72,59 @@ if (cluster.isPrimary) {
 
   // Ruta para manejar eventos del webhook
   app.post('/webhook', async (req, res) => {
-    const body = req.body
+    const body = req.body;
+    console.log('JSON recibido:', JSON.stringify(body, null, 2));
+  
     if (body.object === 'whatsapp_business_account') {
-
-      const entry = body.entry[0]
-      const changes = entry.changes[0]
-      const messageData = changes.value.messages[0]
-      
-      console.log({messageData, changes, entry})
-
-      // if (messageData && messageData.type === 'text') {
-      //   const from = messageData.from // Número de teléfono del cliente
-      //   const messageText = messageData.text.body // Texto del mensaje
-
-      //   await db.run(
-      //     `INSERT INTO messages (content, client_offset, phone_number) VALUES (?, ?, ?)`,
-      //     messageText,
-      //     null,
-      //     from
-      //   )
-
-      //   io.emit('chat message', messageText, from)
-      // }
-
-      res.status(200).send('EVENT_RECEIVED')
-    } else {
-      res.sendStatus(404)
+      const entry = body.entry?.[0]; // Valida que entry exista y tenga al menos un elemento
+      if (!entry) {
+        console.error('No se encontró "entry" en el webhook');
+        return res.sendStatus(400);
+      }
+  
+      const changes = entry.changes?.[0]; // Valida que changes exista y tenga al menos un elemento
+      if (!changes) {
+        console.error('No se encontró "changes" en el webhook');
+        return res.sendStatus(400);
+      }
+  
+      const messageData = changes.value?.messages?.[0]; // Valida que messages exista y tenga al menos un mensaje
+      if (!messageData) {
+        console.error('No se encontró "messages" en el webhook');
+        return res.sendStatus(200); // Es posible que sea otro evento, no un mensaje
+      }
+  
+      // Aseguramos que el mensaje sea de texto
+      if (messageData.type === 'text') {
+        const from = messageData.from; // Número de teléfono del cliente
+        const messageText = messageData.text.body; // Texto del mensaje
+  
+        console.log(`Mensaje recibido de WhatsApp (${from}): ${messageText}`);
+  
+        try {
+          // Guarda el mensaje en la base de datos
+          await db.run(
+            `INSERT INTO messages (content, client_offset, phone_number) VALUES (?, ?, ?)`,
+            messageText,
+            null,
+            from
+          );
+  
+          // Envía el mensaje al cliente web
+          io.emit('chat message', messageText, from);
+        } catch (error) {
+          console.error('Error al guardar el mensaje en la base de datos:', error);
+        }
+      }
+  
+      // Respuesta de confirmación
+      return res.status(200).send('EVENT_RECEIVED');
     }
-
-  }
-  )
+  
+    // Si el evento no es de WhatsApp Business
+    res.sendStatus(404);
+  });
+  
 
   function sendMessageToWhatsApp(messageText, phoneNumber) {
     const data = JSON.stringify({
