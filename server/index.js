@@ -70,48 +70,43 @@ if (cluster.isPrimary) {
     }
   })
 
-  // Ruta para manejar eventos del webhook
   app.post('/webhook', async (req, res) => {
     const body = req.body;
-    console.log('JSON recibido:', JSON.stringify(body, null, 2));
   
     if (body.object === 'whatsapp_business_account') {
-      const entry = body.entry?.[0]; // Valida que entry exista y tenga al menos un elemento
+      const entry = body.entry?.[0]; 
       if (!entry) {
         console.error('No se encontró "entry" en el webhook');
         return res.sendStatus(400);
       }
   
-      const changes = entry.changes?.[0]; // Valida que changes exista y tenga al menos un elemento
+      const changes = entry.changes?.[0];
       if (!changes) {
         console.error('No se encontró "changes" en el webhook');
         return res.sendStatus(400);
       }
   
-      const messageData = changes.value?.messages?.[0]; // Valida que messages exista y tenga al menos un mensaje
+      const messageData = changes.value?.messages?.[0];
       if (!messageData) {
         console.error('No se encontró "messages" en el webhook');
-        return res.sendStatus(200); // Es posible que sea otro evento, no un mensaje
+        return res.sendStatus(200); 
       }
   
-      // Aseguramos que el mensaje sea de texto
       if (messageData.type === 'text') {
-        const from = messageData.from; // Número de teléfono del cliente
-        const messageText = messageData.text.body; // Texto del mensaje
-  
+        const from = messageData.from; 
+        const messageText = messageData.text.body; 
+      
         console.log(`Mensaje recibido de WhatsApp (${from}): ${messageText}`);
-  
+      
         try {
-          // Guarda el mensaje en la base de datos
           await db.run(
             `INSERT INTO messages (content, client_offset, phone_number) VALUES (?, ?, ?)`,
             messageText,
             null,
             from
           );
-  
-          // Envía el mensaje al cliente web
-          io.emit('chat message', messageText, from);
+      
+          io.emit('chat message', { content: messageText, from: 'whatsapp' });
         } catch (error) {
           console.error('Error al guardar el mensaje en la base de datos:', error);
         }
@@ -169,9 +164,9 @@ if (cluster.isPrimary) {
   io.on('connection', async (socket) => {
     console.log("Un usuario se ha conectado")
     socket.on('chat message', async (message, clientOffset, callback) => {
-      console.log("Mensaje recibido desde el chat web", message, clientOffset)
-      let result
-      const phoneNumber = '542954526316' 
+      console.log("Mensaje recibido desde el chat web", message, clientOffset);
+
+      const phoneNumber = '542954526316'; 
 
       try {
         result = await db.run(
@@ -179,21 +174,22 @@ if (cluster.isPrimary) {
           message,
           clientOffset,
           phoneNumber
-        )
+        );
 
-        sendMessageToWhatsApp(message, phoneNumber)
+        sendMessageToWhatsApp(message, phoneNumber);
 
-        io.emit('chat message', message, result.lastID)
+        // Envía el mensaje al cliente web con clase 'web'
+        io.emit('chat message', { content: message, from: 'web' });
 
-        callback()
+        callback();
       } catch (error) {
         if (error.errno === 19) {
-          callback()
+          callback();
         } else {
-          console.error(error)
+          console.error(error);
         }
       }
-    })
+    });
 
     if (!socket.recovered) {
       try {
