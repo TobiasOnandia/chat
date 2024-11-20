@@ -57,8 +57,6 @@ if (cluster.isPrimary) {
   const port = process.env.PORT
 
   app.get('/webhook', (req, res) => {
-    console.log(req)
-
     const mode = req.query['hub.mode']
     const token = req.query['hub.verify_token']
     const challenge = req.query['hub.challenge']
@@ -74,40 +72,36 @@ if (cluster.isPrimary) {
 
   // Ruta para manejar eventos del webhook
   app.post('/webhook', async (req, res) => {
-     const body = req.body
-    
-    if(body.object === 'whatsapp_business_account'){
-      console.log(body.entry)
+    const body = req.body
+    if (body.object === 'whatsapp_business_account') {
 
-      const { changes } = body.entry
-      console.log(changes)
-    } 
-    
-    // if (body.object === 'whatsapp_business_account') {
-    //   const entry = body.entry[0]
-    //   const changes = entry.changes[0]
-    //   const messageData = changes.value.messages[0]
+      const entry = body.entry[0]
+      const changes = entry.changes[0]
+      const messageData = changes.value.messages[0]
       
-    //   if (messageData && messageData.type === 'text') {
-    //     const from = messageData.from // Número de teléfono del cliente
-    //     const messageText = messageData.text.body // Texto del mensaje
+      console.log({messageData, changes, entry})
 
+      // if (messageData && messageData.type === 'text') {
+      //   const from = messageData.from // Número de teléfono del cliente
+      //   const messageText = messageData.text.body // Texto del mensaje
 
-    //     await db.run(
-    //       `INSERT INTO messages (content, client_offset, phone_number) VALUES (?, ?, ?)`,
-    //       messageText,
-    //       null,
-    //       from
-    //     )
+      //   await db.run(
+      //     `INSERT INTO messages (content, client_offset, phone_number) VALUES (?, ?, ?)`,
+      //     messageText,
+      //     null,
+      //     from
+      //   )
 
-    //     io.emit('chat message', messageText, from)
-    //   }
+      //   io.emit('chat message', messageText, from)
+      // }
 
-    //   res.status(200).send('EVENT_RECEIVED')
-    // } else {
-    //   res.sendStatus(404)
-    // }
-  })
+      res.status(200).send('EVENT_RECEIVED')
+    } else {
+      res.sendStatus(404)
+    }
+
+  }
+  )
 
   function sendMessageToWhatsApp(messageText, phoneNumber) {
     const data = JSON.stringify({
@@ -152,6 +146,7 @@ if (cluster.isPrimary) {
   io.on('connection', async (socket) => {
     console.log("Un usuario se ha conectado")
     socket.on('chat message', async (message, clientOffset, callback) => {
+      console.log("Mensaje recibido desde el chat web", message, clientOffset)
       let result
       const phoneNumber = '542954526316' 
 
