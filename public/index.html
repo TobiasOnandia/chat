@@ -3,341 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
     <title>Chat online</title>
+    <script type="module" src="/socket.io/socket.io.js"></script>
+    <script type="module" src="/js/script.js"></script>
 </head>
-<script type="module" src="/socket.io/socket.io.js"></script>
 
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
-
-    :root{
-        --background: #131313;
-        --foreground: #2e333d;
-        --muted: #474c55;
-        --accent: #6b8afd ;
-        --accent-foreground: #ffffff;
-    }
-    #root, #__next {
-        isolation: isolate;
-    }
-    *, *::before, *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        color: var(--accent-foreground);
-
-    }
-    body {
-        line-height: 1.5;
-        -webkit-font-smoothing: antialiased;
-        font-family: 'Montserrat', sans-serif;
-        background-color: var(--secondary-color);
-        color: var(--primary-color);
-        display: flex;
-    }
-    
-    img, picture, video, canvas, svg {
-        display: block;
-        max-width: 100%;
-    }
-    
-    input, button, textarea, select {
-        font: inherit;
-    }
-    
-    p, h1, h2, h3, h4, h5, h6 {
-        overflow-wrap: break-word;
-    }
-    
-    p {
-        text-wrap: pretty;
-    }
-    h1, h2, h3, h4, h5, h6 {
-        text-wrap: balance;
-    }
-    ul{
-        list-style: none;
-    }
-
-    main{
-        flex: 1;
-        background-color: var(--foreground);
-        height: 100vh;
-    }
-
-    #messages{
-        list-style: none;
-        overflow-y: scroll;
-        height: 85%;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        & > li {
-            padding: 0.5rem 1rem;
-            background-color: var(--accent);
-            border-radius: 5px;
-            width: max-content;
-            margin: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;    
-            justify-content: center;
-        }
-
-        & > li.message.web{
-            position: relative;
-            left: 100vh;
-        }
-
-        & > li.message.whatsapp{
-            background-color: rgb(121, 255, 121);
-            
-            & > svg{
-                stroke: rgb(0, 70, 30);
-            }
-            & > span{
-                color: rgb(0, 70, 30);
-            }
-        }
-    }
-
-
-
-    .content-users{
-        display: flex;
-        flex-direction: column;
-        align-items: start;
-        justify-content: start;
-        padding: 1rem;
-        gap: 2rem;
-        border-radius: 10px;
-    }
-
-    .content-navigation{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 1rem 2rem;
-        width: max-content;
-        background-color: var(--background);
-        position: relative;
-
-        &>h1{
-            font-size: 1.5rem;
-            flex: 0.5;
-        }
-
-
-        & > nav{
-            display: flex;
-            flex:1;
-        }
-
-    }
-
-    .nav-actions{
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        width: 100%;
-
-        & > li {
-            width: 2.5rem;
-            height: 2.5rem;
-            cursor: pointer;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        & > li:hover {
-            background-color: var(--accent);
-        }
-    }
-
-    a{
-        border-radius: 10px;
-        padding: 0.5rem;
-        background-color: var(--muted);
-        &:hover{
-            background-color: var(--accent);
-        }
-    }
-
-    .content-header, .chat-actions{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.5rem 1rem;
-        gap: 1rem;
-        
-    }
-
-    .content-messages{
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 92.3%;
-        padding: 0.5rem 1rem;
-
-    }
-
-    form{
-        display: flex;
-        gap: 0.2rem;
-    }
-
-    input{
-        flex: 1;
-        border-radius: 5px;
-        height: 2rem;
-        padding: 0.5rem;
-        background-color: var(--muted);
-        border: none;
-        outline: none;
-        &:is(:focus, :active){
-            outline: 1px solid var(--accent);
-        }
-    }
-
-    label{
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        position: relative;
-
-        & > svg{
-            position: absolute;
-            right: 0.5rem;
-        }
-    }
-
-    input[type="search"]{
-        padding: 1rem;
-        height: 2rem;
-    }
-
-    button{
-        border-radius: 5px;
-        color: var(--background);
-        background-color: inherit;
-        cursor: pointer;
-        padding:  0.2rem;
-        outline: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: none;
-        border: none;
-
-
-        &:hover{
-            background-color: var(--accent);
-        }
-    }
-
-    aside{
-        display: flex;
-        flex: 0.2;
-        height: 100vh;
-        background-color: var(--foreground);        
-
-    }
-
-    #users{
-
-        & > li {
-            padding: 1rem;
-            cursor: pointer;
-            border-radius: 5px;
-            &:hover{
-                background-color: var(--accent);
-            }
-        }
-    }
-
-    #users > li > p {
-    width: 15rem;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    }
-
-
-  
-</style>
-
-<script type="module">
-    let counter = 0
-    const socket = io({
-        auth: {
-            serverOffset: 0
-        },
-        ackTimeout: 10000,
-        retries:3
-    })
-    const $ = (selector) => document.querySelector(selector)
-
-    const form = $('form')
-    const input = $('#sendMessage')
-    const messages = $('#messages')
-   
-    form.addEventListener('submit', (e) => {
-        e.preventDefault()
-        if(input.value){
-            const clientOffset = `${socket.id}-${counter++}`
-            socket.emit('chat message', input.value, clientOffset)
-            input.value = ''
-        }
-    })
-
-    socket.on('chat message', (message, serverOffset, from) => {
-        console.log("Mensaje recibido desde whatsapp",message)
-        const messageElement = document.createElement('li')
-        messageElement.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-user"><path d="M0 0h24v24H0z" stroke="none"/><path d="M8 7a4 4 0 1 0 8 0 4 4 0 0 0-8 0M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
-        <span>${message}</span>
-        `
-        
-        if(from === 'web'){
-            messageElement.classList.add('message', 'web')
-            messageElement.style.left = '100vh'
-        } else {
-            messageElement.classList.add('message', 'whatsapp')
-            messageElement.style.left = '0'
-        }
-
-        messages.appendChild(messageElement)
-        window.scrollTo(0, document.body.scrollHeight)
-        socket.auth.serverOffset = serverOffset
-    })
-
-
-    const searchInput = $('#search');
-    const userList = $('#users');
-
-    searchInput.addEventListener('input', (e) => {
-        const filter = e.target.value.toLowerCase();
-        const users = userList.querySelectorAll('li');
-
-        users.forEach(user => {
-            const userName = user.querySelector('h3').textContent.toLowerCase();
-            const userMessage = user.querySelector('p').textContent.toLowerCase();
-
-            if (userName.includes(filter) || userMessage.includes(filter)) {
-                user.style.display = 'block';
-            } else {
-                user.style.display = 'none';
-            }
-        });
-    });
-
-</script>
 <body>
     <aside>
-
         <section class="content-navigation">
             <h1>CH</h1>
 
@@ -345,21 +18,48 @@
                 <ul class="nav-actions">
                     <li>
                         <button>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-hipchat"><path d="M0 0h24v24H0z" stroke="none"/><path d="M17.802 17.292s.077-.055.2-.149c1.843-1.425 3-3.49 3-5.789 0-4.286-4.03-7.764-9-7.764s-9 3.478-9 7.764c0 4.288 4.03 7.646 9 7.646.424 0 1.12-.028 2.088-.084 1.262.82 3.104 1.493 4.716 1.493.499 0 .734-.41.414-.828-.486-.596-1.156-1.551-1.416-2.29z"/><path d="M7.5 13.5c2.5 2.5 6.5 2.5 9 0"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-hipchat"><path d="M0 0h24v24H0z" stroke="none"/><path d="M17.802 17.292s.077-.055.2-.149c1.843-1.425 3-3.49 3-5.789 0-4.286-4.03-7.764-9-7.764s-9 3.478-9 7.764c0 4.288 4.03 7.646 9 7.646.424 0 1.12-.028 2.088-.084 1.262.82 3.104 1.493 4.716 1.493.499 0 .734-.41.414-.828-.486-.596-1.156-1.551-1.416-2.29z"/><path d="M7.5 13.5c2.5 2.5 6.5 2.5 9 0"/></svg>
                         </button>
                     </li>
                     <li>
                         <button>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-folder"><path d="M0 0h24v24H0z" stroke="none"/><path d="M5 4h4l3 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-folder"><path d="M0 0h24v24H0z" stroke="none"/><path d="M5 4h4l3 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2"/></svg>
                         </button>
                     </li>
                     <li>
                         <button>
-                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-calendar"><path d="M0 0h24v24H0z" stroke="none"/><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7zM16 3v4M8 3v4M4 11h16M11 15h1M12 15v3"/></svg>
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-calendar"><path d="M0 0h24v24H0z" stroke="none"/><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7zM16 3v4M8 3v4M4 11h16M11 15h1M12 15v3"/></svg>
                         </button>
+                    </li>
+                    <li>
+                        
+                        <button class="openDialog">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path d="M0 0h24v24H0z" stroke="none"/><path d="M12 5v14M5 12h14"/></svg>
+                        </button>
+
+                        <dialog class="dialog">
+                            <form action="" class="formUser">
+                                <label for="user">
+                                    Nombre de usuario:
+                                    <input type="text" name="user" id="user" placeholder="Tobias">
+                                </label>
+                                <label for="phoneNumber">
+                                    Número de teléfono:
+                                    <input type="text" name="phoneNumber" id="phoneNumber" placeholder="+542954270707">
+                                </label>
+                                <label for="email">
+                                    Email:
+                                    <input type="email" name="email" id="email" placeholder="tobiasonandia0@gmail.com">
+                                </label>
+                                <menu>
+                                    <button type="submit" class="addUser">Agregar</button>
+                                    <button type="button" class="closeDialog">Cancelar</button>
+                                </menu>
+                            </form>
+                        </dialog> 
+
                     </li>
                 </ul>
-            
             </nav>
             <a href="#">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-user"><path d="M0 0h24v24H0z" stroke="none"/><path d="M8 7a4 4 0 1 0 8 0 4 4 0 0 0-8 0M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
@@ -367,18 +67,15 @@
         </section>
 
         <section class="content-users">
-            <label for="search">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path d="M0 0h24v24H0z" stroke="none"/><path d="M3 10a7 7 0 1 0 14 0 7 7 0 1 0-14 0M21 21l-6-6"/></svg>
-                <input type="search" id="search" name="search" placeholder="Buscar...">
-            </label>
+             <header class="content-search">
+                <label for="search">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path d="M0 0h24v24H0z" stroke="none"/><path d="M3 10a7 7 0 1 0 14 0 7 7 0 1 0-14 0M21 21l-6-6"/></svg>
+                    <input type="search" id="search" name="search" placeholder="Buscar...">
+                </label>
+             </header>
             <ul id="users">
                 <li>
                     <h3>Usuario 1</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</p>
-                </li>
-
-                <li>
-                    <h3>Usuario 2</h3>
                     <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</p>
                 </li>
             </ul>
@@ -417,9 +114,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-send"><path d="M0 0h24v24H0z" stroke="none"/><path d="M10 14 21 3M21 3l-6.5 18a.55.55 0 0 1-1 0L10 14l-7-3.5a.55.55 0 0 1 0-1L21 3"/></svg>
                 </button>
             </form>
-
         </section>
-
     </main>
+
+
 </body>
 </html>
