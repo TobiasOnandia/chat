@@ -96,8 +96,6 @@ if (cluster.isPrimary) {
         const from = messageData.from; 
         const messageText = messageData.text.body; 
   
-        console.log(`Mensaje recibido de WhatsApp (${from}): ${messageText}`);
-  
         try {
           await db.run(
             `INSERT INTO messages (content, client_offset, phone_number) VALUES (?, ?, ?)`,
@@ -164,7 +162,7 @@ if (cluster.isPrimary) {
 
   io.on('connection', async (socket) => {
     console.log("Un usuario se ha conectado")
-    socket.on('chat message', async (message, clientOffset, callback) => {
+    socket.on('chat message', async (message, clientOffset, callback, from) => {
       console.log("Mensaje recibido desde el chat web", message, clientOffset)
       let result
       const phoneNumber = '542954526316' 
@@ -179,7 +177,7 @@ if (cluster.isPrimary) {
 
         sendMessageToWhatsApp(message, phoneNumber)
 
-        io.emit('chat message', message, result.lastID)
+        io.emit('chat message', message, result.lastID, from)
 
         callback()
       } catch (error) {
