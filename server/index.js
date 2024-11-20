@@ -95,9 +95,9 @@ if (cluster.isPrimary) {
       if (messageData.type === 'text') {
         const from = messageData.from; 
         const messageText = messageData.text.body; 
-      
+  
         console.log(`Mensaje recibido de WhatsApp (${from}): ${messageText}`);
-      
+  
         try {
           await db.run(
             `INSERT INTO messages (content, client_offset, phone_number) VALUES (?, ?, ?)`,
@@ -105,8 +105,9 @@ if (cluster.isPrimary) {
             null,
             from
           );
-      
-          io.emit('chat message', { content: messageText, from: 'whatsapp' });
+  
+          // Envía el mensaje al cliente web
+          io.emit('chat message', messageText, from);
         } catch (error) {
           console.error('Error al guardar el mensaje en la base de datos:', error);
         }
@@ -164,9 +165,9 @@ if (cluster.isPrimary) {
   io.on('connection', async (socket) => {
     console.log("Un usuario se ha conectado")
     socket.on('chat message', async (message, clientOffset, callback) => {
-      console.log("Mensaje recibido desde el chat web", message, clientOffset);
-
-      const phoneNumber = '542954526316'; 
+      console.log("Mensaje recibido desde el chat web", message, clientOffset)
+      let result
+      const phoneNumber = '542954526316' 
 
       try {
         result = await db.run(
@@ -174,22 +175,21 @@ if (cluster.isPrimary) {
           message,
           clientOffset,
           phoneNumber
-        );
+        )
 
-        sendMessageToWhatsApp(message, phoneNumber);
+        sendMessageToWhatsApp(message, phoneNumber)
 
-        // Envía el mensaje al cliente web con clase 'web'
-        io.emit('chat message', { content: message, from: 'web' });
+        io.emit('chat message', message, result.lastID)
 
-        callback();
+        callback()
       } catch (error) {
         if (error.errno === 19) {
-          callback();
+          callback()
         } else {
-          console.error(error);
+          console.error(error)
         }
       }
-    });
+    })
 
     if (!socket.recovered) {
       try {
