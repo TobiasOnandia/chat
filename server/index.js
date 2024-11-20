@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 'use strict'
 import express from 'express'
 import { createServer } from 'node:http'
@@ -29,7 +30,6 @@ if (cluster.isPrimary) {
     adapter: createAdapter()
   })
 
-  // eslint-disable-next-line no-undef
   const ACCESS_TOKEN = process.env.ACCESS_TOKEN
   const VERIFY_TOKEN = 'myTokenAccess'
   const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID
@@ -56,7 +56,6 @@ if (cluster.isPrimary) {
 
   const port = process.env.PORT
 
-  // Ruta para validar el webhook
   app.get('/webhook', (req, res) => {
     const mode = req.query['hub.mode']
     const token = req.query['hub.verify_token']
@@ -73,40 +72,36 @@ if (cluster.isPrimary) {
 
   // Ruta para manejar eventos del webhook
   app.post('/webhook', async (req, res) => {
-    const body = req.body
+     const body = req.body
     console.log(body)
-    if (body.object === 'whatsapp_business_account') {
-      const entry = body.entry[0]
-      const changes = entry.changes[0]
-      const messageData = changes.value.messages[0]
+    // console.log(body)
+    // if (body.object === 'whatsapp_business_account') {
+    //   const entry = body.entry[0]
+    //   const changes = entry.changes[0]
+    //   const messageData = changes.value.messages[0]
+      
+    //   if (messageData && messageData.type === 'text') {
+    //     const from = messageData.from // Número de teléfono del cliente
+    //     const messageText = messageData.text.body // Texto del mensaje
 
-      if (messageData && messageData.type === 'text') {
-        const from = messageData.from // Número de teléfono del cliente
-        const messageText = messageData.text.body // Texto del mensaje
 
-        console.log(`Mensaje recibido de WhatsApp (${from}): ${messageText}`)
+    //     await db.run(
+    //       `INSERT INTO messages (content, client_offset, phone_number) VALUES (?, ?, ?)`,
+    //       messageText,
+    //       null,
+    //       from
+    //     )
 
-        // Guardar mensaje en la base de datos
-        await db.run(
-          `INSERT INTO messages (content, client_offset, phone_number) VALUES (?, ?, ?)`,
-          messageText,
-          null,
-          from
-        )
+    //     io.emit('chat message', messageText, from)
+    //   }
 
-        // Reenviar el mensaje al chat web usando Socket.io
-        io.emit('chat message', messageText, from)
-      }
-
-      res.status(200).send('EVENT_RECEIVED')
-    } else {
-      res.sendStatus(404)
-    }
+    //   res.status(200).send('EVENT_RECEIVED')
+    // } else {
+    //   res.sendStatus(404)
+    // }
   })
 
-  // Función para enviar mensajes a través de WhatsApp
   function sendMessageToWhatsApp(messageText, phoneNumber) {
-    console.log("Enviando mensaje a whatsapp", messageText, phoneNumber)
     const data = JSON.stringify({
       messaging_product: "whatsapp",
       to: phoneNumber,
@@ -146,16 +141,14 @@ if (cluster.isPrimary) {
     req.end()
   }
 
-  // Manejo de conexión de Socket.io
   io.on('connection', async (socket) => {
     console.log("Un usuario se ha conectado")
     socket.on('chat message', async (message, clientOffset, callback) => {
       console.log("Mensaje recibido desde el chat web", message, clientOffset)
       let result
-      const phoneNumber = '542954526316' // Número de teléfono del cliente
+      const phoneNumber = '542954526316' 
 
       try {
-        // Insertar el mensaje en la base de datos
         result = await db.run(
           `INSERT INTO messages (content, client_offset, phone_number) VALUES (?, ?, ?)`,
           message,
@@ -163,10 +156,8 @@ if (cluster.isPrimary) {
           phoneNumber
         )
 
-        // Reenviar el mensaje a WhatsApp
         sendMessageToWhatsApp(message, phoneNumber)
 
-        // Emite el mensaje al chat web
         io.emit('chat message', message, result.lastID)
 
         callback()
@@ -198,7 +189,6 @@ if (cluster.isPrimary) {
     })
   })
 
-  // Iniciar el servidor
   server.listen(port, () => {
     console.log(`El servidor está corriendo en el puerto ${port}`)
   })
