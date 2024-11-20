@@ -57,6 +57,8 @@ if (cluster.isPrimary) {
   const port = process.env.PORT
 
   app.get('/webhook', (req, res) => {
+    console.log(req)
+
     const mode = req.query['hub.mode']
     const token = req.query['hub.verify_token']
     const challenge = req.query['hub.challenge']
@@ -73,8 +75,14 @@ if (cluster.isPrimary) {
   // Ruta para manejar eventos del webhook
   app.post('/webhook', async (req, res) => {
      const body = req.body
-    console.log(body)
-    // console.log(body)
+    
+    if(body.object === 'whatsapp_business_account'){
+      console.log(body.entry)
+
+      const { changes } = body.entry
+      console.log(changes)
+    } 
+    
     // if (body.object === 'whatsapp_business_account') {
     //   const entry = body.entry[0]
     //   const changes = entry.changes[0]
@@ -144,7 +152,6 @@ if (cluster.isPrimary) {
   io.on('connection', async (socket) => {
     console.log("Un usuario se ha conectado")
     socket.on('chat message', async (message, clientOffset, callback) => {
-      console.log("Mensaje recibido desde el chat web", message, clientOffset)
       let result
       const phoneNumber = '542954526316' 
 
