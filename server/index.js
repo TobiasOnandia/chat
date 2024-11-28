@@ -162,10 +162,10 @@ if (cluster.isPrimary) {
 
   io.on('connection', async (socket) => {
     console.log("Un usuario se ha conectado")
-    socket.on('chat message', async (message, clientOffset, callback, from = 'web') => {
+    socket.on('chat message', async (message, clientOffset, callback, from = 'web', phone) => {
       console.log("Mensaje recibido desde el chat web", message, clientOffset)
       let result
-      const phoneNumber = '542954526316' 
+      const phoneNumber = `+54${phone}` 
 
       try {
         result = await db.run(

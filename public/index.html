@@ -11,7 +11,10 @@
 
 <body>
     <header>
-        
+        <h1></h1>
+        <button class="openModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path d="M0 0h24v24H0z" stroke="none"/><path d="M12 5v14M5 12h14"/></svg>
+        </button>
     </header>
     <main>
         <section >
@@ -22,13 +25,15 @@
                 <input type="text" id="sendMessage" name="message" placeholder="Escribe tu mensaje">
                 <button type="submit"  class="send-button">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-send-2"><path d="M0 0h24v24H0z" stroke="none"/><path d="M4.698 4.034 21 12 4.698 19.966a.503.503 0 0 1-.546-.124.555.555 0 0 1-.12-.568L6.5 12 4.032 4.726a.555.555 0 0 1 .12-.568.503.503 0 0 1 .546-.124zM6.5 12H21"/></svg>
-                </button>
+                </button> 
             </form>
         </section>    
     </main>
-    <dialog open>
+
+    <dialog class="modal">
         <form action="" class="formUser">
             <legend>Agregar Numero</legend>
+            <label for="phone">Numero</label>
             <input type="number" name="phone">
             <button class="addNumber" name="addNumber">Agregar</button>
         </form>

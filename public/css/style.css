@@ -105,8 +105,61 @@ input {
   cursor: pointer;
 }
 
-.add{
+.openModal{
   border: none;
   background-color: transparent;
   cursor: pointer;
+}
+
+
+dialog{
+  position: absolute;
+  top: 50%;
+  bottom: 50%;
+  left: 50%;
+  right: 50%;
+  transform: translate(-50%,-50%);
+  border: none;
+  border-radius: 10px;
+}
+
+.formUser{
+
+
+  width: 300px;
+  height: 200px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  & > legend{
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  & > input{
+    border-radius: 5px;
+    border: 1px solid #333;
+    height: 2rem;
+    width: 100%;
+    padding: 0px 10px;
+    font-size: 1rem;
+  }
+
+
+  & > button {
+    border-radius: 5px;
+    width: 100%;
+    padding: 10px 20px;
+    background-color: #071853;
+    border:none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+
+  }
+
 }

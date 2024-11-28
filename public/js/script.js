@@ -23,7 +23,6 @@ form.addEventListener('submit', (e) => {
 })
 
 socket.on('chat message', (message, serverOffset, from) => {
-    console.log("Mensaje recibido desde whatsapp",message)
     const messageElement = document.createElement('li')
     messageElement.innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-user"><path d="M0 0h24v24H0z" stroke="none"/><path d="M8 7a4 4 0 1 0 8 0 4 4 0 0 0-8 0M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
@@ -42,13 +41,10 @@ socket.on('chat message', (message, serverOffset, from) => {
 })
 
 const header = $('header')
+header.querySelector('h1').textContent = 'chat online'
 
-header.innerHTML = `
-        <h1>Chat Online</h1>
-        <button class="add">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path d="M0 0h24v24H0z" stroke="none"/><path d="M12 5v14M5 12h14"/></svg>
-        </button>
-`
+
+
 
 $('.formUser').addEventListener('submit', (e) => {
     e.preventDefault()
@@ -56,11 +52,23 @@ $('.formUser').addEventListener('submit', (e) => {
     const formData = new FormData(form)
     const phone = formData.get('phone')
 
+    if(phone === ' '){
+        alert('Ingresa un numero valido')
+        return
+    }
 
-    header.innerHTML = `
-        <h1>+54${phone}</h1>
-        <button class="add">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path d="M0 0h24v24H0z" stroke="none"/><path d="M12 5v14M5 12h14"/></svg>
-        </button>
-`
+    socket.emit('chat message', phone)
+
+
+    header.querySelector('h1').textContent = phone
+        form.reset()
+        modal.close()
 })
+
+const modal = $('.modal')
+
+$('.openModal').addEventListener('click', () => {
+    console.log('Abriendo modal')
+   modal.showModal()
+})
+
